@@ -12,7 +12,7 @@ exports.up = function (knex) {
       .notNullable()
       .onDelete("CASCADE");
     table
-      .enu("status", ["reserved", "paid_out"])
+      .enu("status", ["free", "reserved", "paid_out"])
       .notNullable()
       .defaultTo("reserved");
     table.integer("number").notNullable();

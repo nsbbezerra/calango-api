@@ -60,4 +60,38 @@ module.exports = {
       return res.status(400).json(erros);
     }
   },
+
+  async SetBannAdmin(req, res) {
+    const { id } = req.params;
+    const { active_admin } = req.body;
+    try {
+      await knex("clients").where({ identify: id }).update({ active_admin });
+      return res.status(201).json({ message: "Alteração concluída com êxito" });
+    } catch (error) {
+      let erros = {
+        status: "400",
+        type: "Erro no login",
+        message: "Ocorreu um erro alterar a informação",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
+
+  async SetBannClient(req, res) {
+    const { id } = req.params;
+    const { active_client } = req.body;
+    try {
+      await knex("clients").where({ identify: id }).update({ active_client });
+      return res.status(201).json({ message: "Alteração concluída com êxito" });
+    } catch (error) {
+      let erros = {
+        status: "400",
+        type: "Erro no login",
+        message: "Ocorreu um erro alterar a informação",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
 };

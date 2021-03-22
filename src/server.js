@@ -3,10 +3,12 @@ const express = require("express");
 const cors = require("cors");
 const routes = require("./routes/index");
 const app = express();
+const path = require("path");
 
 app.use(express.json());
 app.use(cors());
 app.use(routes);
+app.use("/img", express.static(path.resolve(__dirname, "..", "upload")));
 
 const port = process.env.PORT || 3333;
 

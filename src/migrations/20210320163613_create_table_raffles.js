@@ -14,13 +14,13 @@ exports.up = function (knex) {
     table.json("pix_keys");
     table.json("bank_transfer");
     table.string("description").notNullable();
+    table.string("justify");
+    table.string("refused");
     table
-      .enu("status", ["open", "cancel", "finalized", "waiting"])
+      .enu("status", ["open", "cancel", "drawn", "waiting", "refused"])
       .notNullable()
       .defaultTo("waiting");
     table.integer("number_drawn");
-    table.string("thumbnailBlob");
-    table.string("bannerBlob");
     table.string("thumbnail");
     table.string("banner");
     table.timestamp("created_at").defaultTo(knex.fn.now());
