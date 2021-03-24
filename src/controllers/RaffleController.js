@@ -13,26 +13,31 @@ module.exports = {
       pix_keys,
       bank_transfer,
       description,
+      raffle_value,
     } = req.body;
     const { filename } = req.file;
-
     try {
-      await knex("raffles").insert({
-        identify: uniqid("sorteio-"),
-        name,
-        qtd_numbers,
-        draw_date,
-        draw_time,
-        client_id,
-        pix_keys: JSON.stringify(pix_keys),
-        bank_transfer: JSON.stringify(bank_transfer),
-        description,
-        thumbnail: filename,
-      });
+      const [id] = await knex("raffles")
+        .insert({
+          identify: uniqid("sorteio-"),
+          name,
+          qtd_numbers,
+          draw_date,
+          draw_time,
+          client_id,
+          pix_keys,
+          bank_transfer,
+          description,
+          thumbnail: filename,
+          raffle_value,
+        })
+        .returning("id");
       return res.status(201).json({
         message: "Sorteio cadastrado com sucesso, aguarde a liberação",
+        id,
       });
     } catch (error) {
+      console.log(error);
       let erros = {
         status: "400",
         type: "Erro no cadastro",
@@ -44,13 +49,14 @@ module.exports = {
   },
 
   async StoreBanner(req, res) {
-    const { id } = req.body;
+    const { id } = req.params;
     const { filename } = req.file;
 
     try {
       await knex("raffles").where({ id: id }).update({ banner: filename });
       return res.status(201).json({ message: "Banner inserido com sucesso" });
     } catch (error) {
+      console.log(error);
       let erros = {
         status: "400",
         type: "Erro no cadastro",

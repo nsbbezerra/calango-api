@@ -8,7 +8,7 @@ const path = require("path");
 app.use(express.json());
 app.use(cors());
 app.use(routes);
-app.use("/img", express.static(path.resolve(__dirname, "..", "upload")));
+app.use("/img", express.static(path.resolve(__dirname, "..", "uploads")));
 
 const port = process.env.PORT || 3333;
 

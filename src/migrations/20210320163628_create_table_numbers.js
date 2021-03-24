@@ -16,7 +16,7 @@ exports.up = function (knex) {
       .notNullable()
       .defaultTo("reserved");
     table.integer("number").notNullable();
-    table.datetime("expiration_date").notNullable();
+    table.string("expiration_date").notNullable();
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table.timestamp("updated_at").defaultTo(knex.fn.now());
   });

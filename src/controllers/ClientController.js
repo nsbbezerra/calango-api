@@ -18,6 +18,16 @@ module.exports = {
     } = req.body;
 
     try {
+      const find = await knex
+        .select("cpf")
+        .from("clients")
+        .where({ cpf })
+        .first();
+
+      if (find) {
+        return res.status(400).json({ message: "Este CPF já foi cadastrado" });
+      }
+
       await knex("clients").insert({
         identify: uniqid("cliente-"),
         name,
@@ -45,10 +55,64 @@ module.exports = {
     }
   },
 
+  async Update(req, res) {
+    const { id } = req.params;
+    const {
+      name,
+      cpf,
+      phone,
+      email,
+      street,
+      number,
+      comp,
+      district,
+      cep,
+      city,
+      state,
+    } = req.body;
+    try {
+      const client = await knex("clients")
+        .where({ identify: id })
+        .update({
+          name,
+          cpf,
+          phone,
+          email,
+          street,
+          number,
+          comp,
+          district,
+          cep,
+          city,
+          state,
+        })
+        .returning("*");
+
+      return res
+        .status(201)
+        .json({ message: "Alteração concluída com sucesso", client });
+    } catch (error) {
+      let erros = {
+        status: "400",
+        type: "Erro no cadastro",
+        message: "Ocorreu um erro ao cadastrar o cliente",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
+
   async Login(req, res) {
     const { cpf } = req.body;
     try {
-      const client = await knex.select("*").from("clients").where({ cpf });
+      const client = await knex
+        .select("*")
+        .from("clients")
+        .where({ cpf })
+        .first();
+      if (!client) {
+        return res.status(400).json({ message: "Cliente não encontrado" });
+      }
       return res.status(200).json(client);
     } catch (error) {
       let erros = {

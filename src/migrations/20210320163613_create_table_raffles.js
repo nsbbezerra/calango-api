@@ -4,13 +4,14 @@ exports.up = function (knex) {
     table.string("identify").notNullable().unique();
     table.string("name").notNullable();
     table.integer("qtd_numbers").notNullable();
-    table.datetime("draw_date").notNullable();
-    table.time("draw_time").notNullable();
+    table.string("draw_date").notNullable();
+    table.string("draw_time").notNullable();
     table
       .integer("client_id")
       .references("clients.id")
       .notNullable()
       .onDelete("CASCADE");
+    table.decimal("raffle_value", 8, 2);
     table.json("pix_keys");
     table.json("bank_transfer");
     table.string("description").notNullable();
