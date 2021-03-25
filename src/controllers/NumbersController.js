@@ -3,8 +3,8 @@ const date_fns = require("date-fns");
 
 module.exports = {
   async Buy(req, res) {
-    const { raffle_id, client_id, numbers, expiration_date } = req.body;
-    const expiration = date_fns.addHours(new Date(expiration_date), 24);
+    const { raffle_id, client_id, numbers } = req.body;
+    const expiration = date_fns.addHours(new Date(), 24);
     try {
       async function SaveNumber(num) {
         await knex("numbers").insert({

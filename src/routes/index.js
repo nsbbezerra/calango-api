@@ -36,5 +36,6 @@ router.put(
 );
 router.get("/raffles", RaffleController.Show);
 router.get("/findRaffle", RaffleController.Find);
+router.get("/numbers/:id", RaffleController.FindNumbers);
 
 module.exports = router;

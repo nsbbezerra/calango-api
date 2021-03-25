@@ -146,18 +146,9 @@ module.exports = {
         .where("status", "open")
         .innerJoin("clients", "clients.id", "raffles.client_id")
         .orderBy("raffles.created_at");
-      const numbers = await knex
-        .select([
-          "numbers.id",
-          "numbers.raffle_id",
-          "numbers.status",
-          "numbers.number",
-          "clients.name",
-        ])
-        .from("numbers")
-        .innerJoin("clients", "clients.id", "numbers.client_id");
+      const configs = await knex("configs").select("*").first();
       const url = `${config.url}`;
-      return res.status(200).json({ raffles, numbers, url });
+      return res.status(200).json({ raffles, url, configs });
     } catch (error) {
       let erros = {
         status: "400",
@@ -195,6 +186,38 @@ module.exports = {
         .innerJoin("clients", "clients.id", "raffles.client_id")
         .orderBy("raffles.created_at");
       return res.status(200).json(raffles);
+    } catch (error) {
+      let erros = {
+        status: "400",
+        type: "Erro no cadastro",
+        message: "Ocorreu um erro ao buscar as informações",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
+
+  async FindNumbers(req, res) {
+    const { id } = req.params;
+
+    try {
+      const raffle = await knex
+        .select("id")
+        .from("raffles")
+        .where("identify", id)
+        .first();
+      const numbers = await knex
+        .select([
+          "numbers.id",
+          "numbers.raffle_id",
+          "numbers.status",
+          "numbers.number",
+          "clients.name",
+        ])
+        .from("numbers")
+        .where({ raffle_id: raffle.id })
+        .innerJoin("clients", "clients.id", "numbers.client_id");
+      return res.status(200).json({ numbers });
     } catch (error) {
       let erros = {
         status: "400",
