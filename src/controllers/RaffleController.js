@@ -1,6 +1,7 @@
 const knex = require("../database/index");
 const uniqid = require("uniqid");
 const config = require("../configs/index");
+const { isAfter, isBefore } = require("date-fns");
 
 module.exports = {
   async Store(req, res) {
@@ -141,14 +142,14 @@ module.exports = {
           "raffles.thumbnail",
           "clients.id as id_client",
           "clients.name as name_client",
+          "clients.phone as phone_client",
         ])
         .from("raffles")
         .where("status", "open")
         .innerJoin("clients", "clients.id", "raffles.client_id")
         .orderBy("raffles.created_at");
-      const configs = await knex("configs").select("*").first();
       const url = `${config.url}`;
-      return res.status(200).json({ raffles, url, configs });
+      return res.status(200).json({ raffles, url });
     } catch (error) {
       let erros = {
         status: "400",
@@ -213,12 +214,28 @@ module.exports = {
           "numbers.status",
           "numbers.number",
           "clients.name",
+          "clients.id as id_client",
         ])
         .from("numbers")
         .where({ raffle_id: raffle.id })
         .innerJoin("clients", "clients.id", "numbers.client_id");
+      const validate = await knex
+        .select("*")
+        .from("numbers")
+        .where({ raffle_id: raffle.id });
+      async function revalidate(id) {
+        await knex("numbers").where({ id: id }).del();
+      }
+      await validate.forEach((element) => {
+        if (isBefore(new Date(element.expiration_date), new Date())) {
+          if (element.status === "reserved") {
+            revalidate(element.id);
+          }
+        }
+      });
       return res.status(200).json({ numbers });
     } catch (error) {
+      console.log(error);
       let erros = {
         status: "400",
         type: "Erro no cadastro",
