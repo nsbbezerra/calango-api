@@ -6,6 +6,15 @@ module.exports = {
     try {
       const url = `${config.url}`;
       const configs = await knex.select("*").from("configs").first();
+      const numbers = await knex
+        .select("*")
+        .from("numbers")
+        .where({ status: "paid_out" });
+      const banners = await knex
+        .select("id", "identify", "banner")
+        .from("raffles")
+        .where("status", "open")
+        .whereNot("banner", "NULL");
       const raffles = await knex
         .select([
           "raffles.id",
@@ -26,9 +35,10 @@ module.exports = {
           "clients.name as name_client",
         ])
         .from("raffles")
+        .where("status", "open")
         .innerJoin("clients", "clients.id", "raffles.client_id")
         .orderBy("raffles.created_at");
-      return res.status(200).json({ configs, raffles, url });
+      return res.status(200).json({ configs, raffles, url, numbers, banners });
     } catch (error) {
       let erros = {
         status: "400",

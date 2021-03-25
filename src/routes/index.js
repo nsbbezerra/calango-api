@@ -34,5 +34,7 @@ router.put(
   multer(multerConfig).single("banner"),
   RaffleController.StoreBanner
 );
+router.get("/raffles", RaffleController.Show);
+router.get("/findRaffle", RaffleController.Find);
 
 module.exports = router;
