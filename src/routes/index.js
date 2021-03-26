@@ -15,6 +15,7 @@ router.post("/login", ClientController.Login);
 router.put("/bannadmin/:id", ClientController.SetBannAdmin);
 router.put("/bannclient/:id", ClientController.SetBannClient);
 router.put("/clients/:id", ClientController.Update);
+router.get("/clients", ClientController.Show);
 
 /** CONFIGS */
 router.post("/configs", ConfigsController.Store);

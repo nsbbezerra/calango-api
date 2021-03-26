@@ -158,4 +158,19 @@ module.exports = {
       return res.status(400).json(erros);
     }
   },
+
+  async Show(req, res) {
+    try {
+      const clients = await knex.select("*").from("clients").orderBy("name");
+      return res.status(200).json(clients);
+    } catch (error) {
+      let erros = {
+        status: "400",
+        type: "Erro no login",
+        message: "Ocorreu um erro buscar as informações",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
 };
