@@ -70,10 +70,10 @@ module.exports = {
 
   async ManageByAdmin(req, res) {
     const { id } = req.params;
-    const { status, refused } = req.body;
+    const { status, justify } = req.body;
 
     try {
-      await knex("raffles").where({ id: id }).update({ status, refused });
+      await knex("raffles").where({ id: id }).update({ status, justify });
       return res.status(201).json({ message: "Alteração concluída com êxito" });
     } catch (error) {
       let erros = {
@@ -187,6 +187,44 @@ module.exports = {
         .innerJoin("clients", "clients.id", "raffles.client_id")
         .orderBy("raffles.created_at");
       return res.status(200).json(raffles);
+    } catch (error) {
+      let erros = {
+        status: "400",
+        type: "Erro no cadastro",
+        message: "Ocorreu um erro ao buscar as informações",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
+
+  async FindDesk(req, res) {
+    try {
+      const raffles = await knex
+        .select([
+          "raffles.id",
+          "raffles.name",
+          "raffles.identify",
+          "raffles.qtd_numbers",
+          "raffles.draw_date",
+          "raffles.raffle_value",
+          "raffles.pix_keys",
+          "raffles.bank_transfer",
+          "raffles.description",
+          "raffles.justify",
+          "raffles.refused",
+          "raffles.status",
+          "raffles.number_drawn",
+          "raffles.thumbnail",
+          "clients.id as id_client",
+          "clients.name as name_client",
+          "clients.cpf as cpf_client",
+        ])
+        .from("raffles")
+        .innerJoin("clients", "clients.id", "raffles.client_id")
+        .orderBy("raffles.created_at");
+      const url = config.url;
+      return res.status(200).json({ raffles, url });
     } catch (error) {
       let erros = {
         status: "400",

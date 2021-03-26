@@ -129,7 +129,7 @@ module.exports = {
     const { id } = req.params;
     const { active_admin } = req.body;
     try {
-      await knex("clients").where({ identify: id }).update({ active_admin });
+      await knex("clients").where({ id: id }).update({ active_admin });
       return res.status(201).json({ message: "Alteração concluída com êxito" });
     } catch (error) {
       let erros = {
@@ -146,7 +146,7 @@ module.exports = {
     const { id } = req.params;
     const { active_client } = req.body;
     try {
-      await knex("clients").where({ identify: id }).update({ active_client });
+      await knex("clients").where({ id: id }).update({ active_client });
       return res.status(201).json({ message: "Alteração concluída com êxito" });
     } catch (error) {
       let erros = {
