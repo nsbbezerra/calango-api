@@ -41,6 +41,7 @@ router.get("/findRaffle", RaffleController.Find);
 router.get("/numbers/:id", RaffleController.FindNumbers);
 router.get("/findDesk", RaffleController.FindDesk);
 router.put("/manAdmin/:id", RaffleController.ManageByAdmin);
+router.get("/showRaffles", RaffleController.ShowRaffles);
 
 /** NUMEROS */
 router.post("/numbers", NumbersController.Buy);
