@@ -8,6 +8,7 @@ const ConfigsController = require("../controllers/ConfigsController");
 const SiteController = require("../controllers/SiteController");
 const RaffleController = require("../controllers/RaffleController");
 const NumbersController = require("../controllers/NumbersController");
+const MyDataController = require("../controllers/MyDataController");
 
 /** CLIENTES */
 router.post("/clients", ClientController.Store);
@@ -45,5 +46,8 @@ router.get("/showRaffles", RaffleController.ShowRaffles);
 
 /** NUMEROS */
 router.post("/numbers", NumbersController.Buy);
+
+/** MEUS DADOS */
+router.get("/mydata/:id", MyDataController.Show);
 
 module.exports = router;

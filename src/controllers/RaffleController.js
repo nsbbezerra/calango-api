@@ -1,7 +1,7 @@
 const knex = require("../database/index");
 const uniqid = require("uniqid");
 const config = require("../configs/index");
-const { isAfter, isBefore } = require("date-fns");
+const { isBefore } = require("date-fns");
 
 module.exports = {
   async Store(req, res) {
@@ -147,7 +147,7 @@ module.exports = {
         .from("raffles")
         .where("status", "open")
         .innerJoin("clients", "clients.id", "raffles.client_id")
-        .orderBy("raffles.created_at");
+        .orderBy("raffles.updated_at");
       const url = `${config.url}`;
       return res.status(200).json({ raffles, url });
     } catch (error) {
@@ -186,7 +186,7 @@ module.exports = {
         .from("raffles")
         .where("status", "open")
         .innerJoin("clients", "clients.id", "raffles.client_id")
-        .orderBy("raffles.created_at");
+        .orderBy("raffles.updated_at");
       return res.status(200).json(raffles);
     } catch (error) {
       let erros = {
@@ -224,7 +224,7 @@ module.exports = {
         .from("raffles")
         .whereNotIn("status", ["refused", "waiting"])
         .innerJoin("clients", "clients.id", "raffles.client_id")
-        .orderBy("raffles.created_at");
+        .orderBy("raffles.updated_at");
       const url = `${config.url}`;
       return res.status(200).json({ raffles, url });
     } catch (error) {
@@ -262,7 +262,7 @@ module.exports = {
         ])
         .from("raffles")
         .innerJoin("clients", "clients.id", "raffles.client_id")
-        .orderBy("raffles.created_at");
+        .orderBy("raffles.updated_at");
       const url = config.url;
       return res.status(200).json({ raffles, url });
     } catch (error) {

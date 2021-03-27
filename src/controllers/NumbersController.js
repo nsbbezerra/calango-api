@@ -17,6 +17,17 @@ module.exports = {
       await numbers.forEach((element) => {
         SaveNumber(parseInt(element));
       });
+      const participant = await knex
+        .select("*")
+        .from("participant")
+        .where({ raffle_id: raffle_id, client_id: client_id })
+        .first();
+      if (!participant) {
+        await knex("participant").insert({
+          raffle_id: raffle_id,
+          client_id: client_id,
+        });
+      }
       return res.status(201).json({
         message:
           "Números reservados com sucesso, entre em contado com o administrador para a liberação.",
