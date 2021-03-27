@@ -40,14 +40,19 @@ router.put(
 router.get("/raffles", RaffleController.Show);
 router.get("/findRaffle", RaffleController.Find);
 router.get("/numbers/:id", RaffleController.FindNumbers);
+router.get("/numbersAdmin/:id", RaffleController.FindNumbersByAdmin);
 router.get("/findDesk", RaffleController.FindDesk);
 router.put("/manAdmin/:id", RaffleController.ManageByAdmin);
 router.get("/showRaffles", RaffleController.ShowRaffles);
+router.put("/updateDate/:id", RaffleController.ChangeDate);
 
 /** NUMEROS */
 router.post("/numbers", NumbersController.Buy);
+router.put("/numbersActive/:id", NumbersController.Update);
 
 /** MEUS DADOS */
-router.get("/mydata/:id", MyDataController.Show);
+router.get("/mydata", MyDataController.Show);
+router.get("/findRafflesAdmin/:id", MyDataController.Admin);
+router.get("/findRafflesClient/:id", MyDataController.Client);
 
 module.exports = router;

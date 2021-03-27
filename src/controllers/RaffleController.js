@@ -106,11 +106,16 @@ module.exports = {
 
   async ChangeDate(req, res) {
     const { id } = req.params;
-    const { draw_date, draw_time } = req.body;
+    const { draw_date } = req.body;
 
     try {
-      await knex("raffles").where({ id: id }).update({ draw_date, draw_time });
-      return res.status(201).json({ message: "Alteração concluída com êxito" });
+      const date = await knex("raffles")
+        .where({ id: id })
+        .update({ draw_date })
+        .returning("*");
+      return res
+        .status(201)
+        .json({ message: "Alteração concluída com êxito", date });
     } catch (error) {
       let erros = {
         status: "400",
@@ -147,7 +152,7 @@ module.exports = {
         .from("raffles")
         .where("status", "open")
         .innerJoin("clients", "clients.id", "raffles.client_id")
-        .orderBy("raffles.updated_at");
+        .orderBy("raffles.updated_at", "desc");
       const url = `${config.url}`;
       return res.status(200).json({ raffles, url });
     } catch (error) {
@@ -186,7 +191,7 @@ module.exports = {
         .from("raffles")
         .where("status", "open")
         .innerJoin("clients", "clients.id", "raffles.client_id")
-        .orderBy("raffles.updated_at");
+        .orderBy("raffles.updated_at", "desc");
       return res.status(200).json(raffles);
     } catch (error) {
       let erros = {
@@ -224,7 +229,7 @@ module.exports = {
         .from("raffles")
         .whereNotIn("status", ["refused", "waiting"])
         .innerJoin("clients", "clients.id", "raffles.client_id")
-        .orderBy("raffles.updated_at");
+        .orderBy("raffles.updated_at", "desc");
       const url = `${config.url}`;
       return res.status(200).json({ raffles, url });
     } catch (error) {
@@ -262,7 +267,7 @@ module.exports = {
         ])
         .from("raffles")
         .innerJoin("clients", "clients.id", "raffles.client_id")
-        .orderBy("raffles.updated_at");
+        .orderBy("raffles.updated_at", "desc");
       const url = config.url;
       return res.status(200).json({ raffles, url });
     } catch (error) {
@@ -285,18 +290,6 @@ module.exports = {
         .from("raffles")
         .where("identify", id)
         .first();
-      const numbers = await knex
-        .select([
-          "numbers.id",
-          "numbers.raffle_id",
-          "numbers.status",
-          "numbers.number",
-          "clients.name",
-          "clients.id as id_client",
-        ])
-        .from("numbers")
-        .where({ raffle_id: raffle.id })
-        .innerJoin("clients", "clients.id", "numbers.client_id");
       const validate = await knex
         .select("*")
         .from("numbers")
@@ -311,7 +304,65 @@ module.exports = {
           }
         }
       });
+      const numbers = await knex
+        .select([
+          "numbers.id",
+          "numbers.raffle_id",
+          "numbers.status",
+          "numbers.number",
+          "clients.name",
+          "clients.id as id_client",
+        ])
+        .from("numbers")
+        .where({ raffle_id: raffle.id })
+        .innerJoin("clients", "clients.id", "numbers.client_id");
+
       return res.status(200).json({ numbers });
+    } catch (error) {
+      console.log(error);
+      let erros = {
+        status: "400",
+        type: "Erro no cadastro",
+        message: "Ocorreu um erro ao buscar as informações",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
+
+  async FindNumbersByAdmin(req, res) {
+    const { id } = req.params;
+
+    try {
+      const validate = await knex
+        .select("*")
+        .from("numbers")
+        .where({ raffle_id: id });
+      async function revalidate(id) {
+        await knex("numbers").where({ id: id }).del();
+      }
+      await validate.forEach((element) => {
+        if (isBefore(new Date(element.expiration_date), new Date())) {
+          if (element.status === "reserved") {
+            revalidate(element.id);
+          }
+        }
+      });
+      const numbers = await knex
+        .select([
+          "numbers.id",
+          "numbers.raffle_id",
+          "numbers.status",
+          "numbers.number",
+          "clients.name",
+          "clients.id as id_client",
+        ])
+        .from("numbers")
+        .where({ raffle_id: id })
+        .innerJoin("clients", "clients.id", "numbers.client_id")
+        .orderBy("number");
+
+      return res.status(200).json(numbers);
     } catch (error) {
       console.log(error);
       let erros = {

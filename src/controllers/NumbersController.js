@@ -78,4 +78,55 @@ module.exports = {
       return res.status(400).json(erros);
     }
   },
+
+  async Update(req, res) {
+    const { id } = req.params;
+    try {
+      const number = await knex
+        .select("*")
+        .from("numbers")
+        .where({ id: id })
+        .first();
+      await knex("numbers").where({ id: id }).update({ status: "paid_out" });
+      const validate = await knex
+        .select("*")
+        .from("numbers")
+        .where({ raffle_id: number.raffle_id });
+      async function revalidate(id) {
+        await knex("numbers").where({ id: id }).del();
+      }
+      await validate.forEach((element) => {
+        if (date_fns.isBefore(new Date(element.expiration_date), new Date())) {
+          if (element.status === "reserved") {
+            revalidate(element.id);
+          }
+        }
+      });
+      const numbers = await knex
+        .select([
+          "numbers.id",
+          "numbers.raffle_id",
+          "numbers.status",
+          "numbers.number",
+          "clients.name",
+          "clients.id as id_client",
+        ])
+        .from("numbers")
+        .where({ raffle_id: number.raffle_id })
+        .innerJoin("clients", "clients.id", "numbers.client_id")
+        .orderBy("number");
+      return res
+        .status(201)
+        .json({ message: "Número ativado com sucesso", numbers });
+    } catch (error) {
+      console.log(error);
+      let erros = {
+        status: "400",
+        type: "Erro no login",
+        message: "Ocorreu um erro ao editar os números",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
 };
