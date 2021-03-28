@@ -43,6 +43,7 @@ module.exports = {
           "raffles.status",
           "raffles.number_drawn",
           "raffles.thumbnail",
+          "raffles.client_drawn",
           "clients.id as id_client",
           "clients.name as name_client",
           "clients.phone as phone_client",

@@ -45,6 +45,8 @@ router.get("/findDesk", RaffleController.FindDesk);
 router.put("/manAdmin/:id", RaffleController.ManageByAdmin);
 router.get("/showRaffles", RaffleController.ShowRaffles);
 router.put("/updateDate/:id", RaffleController.ChangeDate);
+router.put("/blockRaffle/:id", RaffleController.Cancel);
+router.put("/drawn/:id", RaffleController.Drawn);
 
 /** NUMEROS */
 router.post("/numbers", NumbersController.Buy);

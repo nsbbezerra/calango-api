@@ -22,6 +22,7 @@ exports.up = function (knex) {
       .notNullable()
       .defaultTo("waiting");
     table.integer("number_drawn");
+    table.json("client_drawn");
     table.string("thumbnail");
     table.string("banner");
     table.timestamp("created_at").defaultTo(knex.fn.now());

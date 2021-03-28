@@ -374,4 +374,64 @@ module.exports = {
       return res.status(400).json(erros);
     }
   },
+
+  async Cancel(req, res) {
+    const { id } = req.params;
+    const { justify } = req.body;
+    try {
+      const raffle = await knex("raffles")
+        .where("id", id)
+        .update({ justify, status: "cancel" })
+        .returning("*");
+      return res
+        .status(201)
+        .json({ message: "Sorteio cancelado com sucesso", raffle });
+    } catch (error) {
+      let erros = {
+        status: "400",
+        type: "Erro no cadastro",
+        message: "Ocorreu um erro ao editar as informações",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
+
+  async Drawn(req, res) {
+    const { id } = req.params;
+
+    try {
+      const raffle = await knex
+        .select([
+          "numbers.id",
+          "numbers.number",
+          "clients.id as id_client",
+          "clients.name as name_client",
+          "clients.phone as phone_client",
+          "clients.email as email_client",
+        ])
+        .from("numbers")
+        .where({ raffle_id: id, status: "paid_out" })
+        .innerJoin("clients", "clients.id", "numbers.client_id");
+      const random = raffle[Math.floor(Math.random() * raffle.length)];
+      const newRaffle = await knex("raffles")
+        .where({ id: id })
+        .update({
+          number_drawn: random.number,
+          client_drawn: JSON.stringify(random),
+          status: "drawn",
+        })
+        .returning("*");
+      return res.status(200).json({ random, newRaffle });
+    } catch (error) {
+      console.log(error);
+      let erros = {
+        status: "400",
+        type: "Erro no cadastro",
+        message: "Ocorreu um erro ao sortear",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
 };
