@@ -376,13 +376,12 @@ module.exports = {
   },
 
   async FindNumbersByClient(req, res) {
-    const { id } = req.params;
-
+    const { id, raffle } = req.params;
     try {
       const validate = await knex
         .select("*")
         .from("numbers")
-        .where({ client_id: id });
+        .where({ client_id: id, raffle_id: raffle });
       async function revalidate(id) {
         await knex("numbers").where({ id: id }).del();
       }
@@ -403,7 +402,7 @@ module.exports = {
           "clients.id as id_client",
         ])
         .from("numbers")
-        .where({ client_id: id })
+        .where({ client_id: id, raffle_id: raffle })
         .innerJoin("clients", "clients.id", "numbers.client_id")
         .orderBy("number");
 
