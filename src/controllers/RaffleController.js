@@ -375,6 +375,51 @@ module.exports = {
     }
   },
 
+  async FindNumbersByClient(req, res) {
+    const { id } = req.params;
+
+    try {
+      const validate = await knex
+        .select("*")
+        .from("numbers")
+        .where({ client_id: id });
+      async function revalidate(id) {
+        await knex("numbers").where({ id: id }).del();
+      }
+      await validate.forEach((element) => {
+        if (isBefore(new Date(element.expiration_date), new Date())) {
+          if (element.status === "reserved") {
+            revalidate(element.id);
+          }
+        }
+      });
+      const numbers = await knex
+        .select([
+          "numbers.id",
+          "numbers.raffle_id",
+          "numbers.status",
+          "numbers.number",
+          "clients.name",
+          "clients.id as id_client",
+        ])
+        .from("numbers")
+        .where({ client_id: id })
+        .innerJoin("clients", "clients.id", "numbers.client_id")
+        .orderBy("number");
+
+      return res.status(200).json(numbers);
+    } catch (error) {
+      console.log(error);
+      let erros = {
+        status: "400",
+        type: "Erro no cadastro",
+        message: "Ocorreu um erro ao buscar as informações",
+        err: error.message,
+      };
+      return res.status(400).json(erros);
+    }
+  },
+
   async Cancel(req, res) {
     const { id } = req.params;
     const { justify } = req.body;

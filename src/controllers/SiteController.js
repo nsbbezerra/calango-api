@@ -37,7 +37,7 @@ module.exports = {
         .from("raffles")
         .where("status", "open")
         .innerJoin("clients", "clients.id", "raffles.client_id")
-        .orderBy("raffles.created_at");
+        .orderBy("raffles.updated_at", "desc");
       return res.status(200).json({ configs, raffles, url, numbers, banners });
     } catch (error) {
       let erros = {
