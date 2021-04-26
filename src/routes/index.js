@@ -9,6 +9,7 @@ const SiteController = require("../controllers/SiteController");
 const RaffleController = require("../controllers/RaffleController");
 const NumbersController = require("../controllers/NumbersController");
 const MyDataController = require("../controllers/MyDataController");
+const RaffleEditController = require("../controllers/RaffleEditController");
 
 /** CLIENTES */
 router.post("/clients", ClientController.Store);
@@ -60,5 +61,14 @@ router.put("/numbersActive/:id", NumbersController.Update);
 router.get("/mydata", MyDataController.Show);
 router.get("/findRafflesAdmin/:id", MyDataController.Admin);
 router.get("/findRafflesClient/:id", MyDataController.Client);
+
+/** RAFFLE EDIT */
+router.put(
+  "/raffleEditImage/:id",
+  multer(multerConfig).single("thumbnail"),
+  RaffleEditController.EditImage
+);
+router.put("/raffleEditInfo/:id", RaffleEditController.UpdateInfo);
+router.delete("/raffleDelete/:id", RaffleEditController.RemoveRaffle);
 
 module.exports = router;

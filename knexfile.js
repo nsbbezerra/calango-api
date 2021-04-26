@@ -6,8 +6,8 @@ module.exports = {
     client: "pg",
     connection: {
       database: "pmwrifas",
-      user: "nkinformatica",
-      password: "natan210290",
+      user: "postgres",
+      password: "03102190",
     },
     migrations: {
       tableName: "knex_migrations",
